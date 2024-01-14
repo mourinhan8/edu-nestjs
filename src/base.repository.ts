@@ -17,8 +17,8 @@ export class BaseRepository<T extends Document> {
     field?: any | null,
     option?: any | null,
     populate?: any | null,
-  ): Promise<T> {
-    return this.model.findOne(filter, field, option).populate(populate).lean();
+  ): Promise<any> {
+    return this.model.findOne(filter, field, option).populate(populate);
   }
 
   async getByCondition(
@@ -40,6 +40,10 @@ export class BaseRepository<T extends Document> {
 
   async populate(result: T[], option: any) {
     return await this.model.populate(result, option);
+  }
+
+  async findOneAndDelete(id: string) {
+    return this.model.findByIdAndDelete(id, { new: false });
   }
 
   async deleteOne(id: string) {

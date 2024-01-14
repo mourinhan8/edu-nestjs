@@ -1,4 +1,7 @@
-import { Module } from '@nestjs/common';
+import {
+  // Global,
+  Module,
+} from '@nestjs/common';
 import { UserService } from './services/user.service';
 import { UserRepository } from './repositories/user.repository';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -9,7 +12,9 @@ import { AuthController } from './controllers/auth.controller';
 import { JwtStrategy } from './jwt.stragery';
 import { AuthService } from './services/auth.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserController } from './controllers/user.controller';
 
+// @Global()
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -34,7 +39,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, UserController],
   providers: [UserService, AuthService, UserRepository, JwtStrategy],
+  exports: [UserService],
 })
 export class UserModule {}

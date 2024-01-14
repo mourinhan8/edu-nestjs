@@ -20,9 +20,9 @@ UserSchema.virtual('posts', {
   foreignField: 'user',
   justOne: false,
   // count: true,
-  match: {
-    categories: { $size: 2 },
-  },
+  // match: {
+  //   categories: { $size: 2 },
+  // },
 });
 
 export { UserSchema };
