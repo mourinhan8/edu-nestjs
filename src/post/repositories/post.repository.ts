@@ -13,7 +13,7 @@ export class PostRepository extends BaseRepository<Post> {
     super(postModel);
   }
 
-  async countDocuments(filter) {
+  async countDocuments(filter): Promise<number> {
     return this.postModel.countDocuments(filter);
   }
 }

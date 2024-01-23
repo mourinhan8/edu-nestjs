@@ -1,4 +1,4 @@
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 
 export class CreatePostDto {
   @IsNotEmpty()
@@ -22,4 +22,15 @@ export class UpdatePostDto {
 
   @IsNotEmpty()
   title: string;
+}
+
+export class PaginationPostDto {
+  @IsNotEmpty()
+  page: number;
+
+  @IsNotEmpty()
+  limit: number;
+
+  @IsOptional()
+  startId: string;
 }

@@ -9,6 +9,12 @@ import { CategorySchema } from './models/category.model';
 import { CategoryController } from './controllers/category.controller';
 import { CategoryService } from './services/category.service';
 import { CategoryRepository } from './repositories/category.repository';
+import { CqrsModule } from '@nestjs/cqrs';
+import { CreatePostHandler } from './handler/createPost.handler';
+import { GetPostHandler } from './handler/getPost.handler';
+import { CacheModule } from '@nestjs/cache-manager';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { redisStore } from 'cache-manager-redis-store';
 
 @Global()
 @Module({
@@ -24,8 +30,37 @@ import { CategoryRepository } from './repositories/category.repository';
       },
     ]),
     UserModule,
+    CqrsModule,
+    // CacheModule.register({ ttl: 10 })
+    CacheModule.register({
+      store: redisStore,
+      // Store-specific configuration:
+      host: 'localhost',
+      port: 6379,
+    }),
+    // CacheModule.registerAsync({
+    //   imports: [ConfigModule],
+    //   inject: [ConfigService],
+    //   useFactory: (configService: ConfigService) => {
+    //     return {
+    //       // isGlobal: true,
+    //       store: redisStore,
+    //       host: configService.get<string>('REDIS_HOST'),
+    //       port: configService.get<number>('REDIS_PORT'),
+    //       username: configService.get<string>('REDIS_USERNAME'),
+    //       password: configService.get<string>('REDIS_PASSWORD'),
+    //     }
+    //   },
+    // })
   ],
   controllers: [PostController, CategoryController],
-  providers: [PostService, PostRepository, CategoryService, CategoryRepository],
+  providers: [
+    PostService,
+    PostRepository,
+    CategoryService,
+    CategoryRepository,
+    CreatePostHandler,
+    GetPostHandler,
+  ],
 })
 export class PostModule {}

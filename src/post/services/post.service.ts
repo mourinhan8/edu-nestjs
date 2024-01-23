@@ -8,6 +8,7 @@ import {
 import { CreatePostDto, UpdatePostDto } from '../dto/post.dto';
 import { UserService } from 'src/user/services/user.service';
 import { CategoryRepository } from '../repositories/category.repository';
+import { isValidObjectId } from 'mongoose';
 // import { PostNotFoundException } from '../exceptions/postNotFound.exception';
 
 @Injectable()
@@ -18,14 +19,32 @@ export class PostService {
     private readonly categoryRepository: CategoryRepository,
   ) {}
 
-  async getAllPost() {
-    return await this.postRepository.getByCondition({});
+  async getAllPost(page: number, limit: number, startId: string) {
+    const count = await this.postRepository.countDocuments({});
+    const countPage = count / limit;
+    const posts = await this.postRepository.getByCondition(
+      {
+        _id: {
+          $gt: isValidObjectId(startId) ? startId : '000000000000000000000000',
+        },
+      },
+      'title user',
+      {
+        sort: {
+          _id: 1,
+        },
+        skip: (page - 1) * limit,
+        limit: Number(limit),
+      },
+      { path: 'user', select: '-password -refreshToken' }
+    );
+    return { countPage, posts };
   }
 
   async getPostById(id: string) {
     const post = await this.postRepository.findById(id);
     if (post) {
-      await post.populate({ path: 'user', select: '-password' });
+      await post.populate({ path: 'user', select: '-password -refreshToken' });
       return post;
     } else {
       throw new NotFoundException(id);
