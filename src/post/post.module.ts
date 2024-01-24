@@ -14,11 +14,12 @@ import { CreatePostHandler } from './handler/createPost.handler';
 import { GetPostHandler } from './handler/getPost.handler';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { redisStore } from 'cache-manager-redis-store';
+import * as redisStore from 'cache-manager-redis-store';
 
 @Global()
 @Module({
   imports: [
+    // CacheModule.register({ ttl: 10 }),
     MongooseModule.forFeature([
       {
         name: 'Post',
@@ -31,27 +32,27 @@ import { redisStore } from 'cache-manager-redis-store';
     ]),
     UserModule,
     CqrsModule,
-    // CacheModule.register({ ttl: 10 })
-    CacheModule.register({
-      store: redisStore,
-      // Store-specific configuration:
-      host: 'localhost',
-      port: 6379,
-    }),
-    // CacheModule.registerAsync({
-    //   imports: [ConfigModule],
-    //   inject: [ConfigService],
-    //   useFactory: (configService: ConfigService) => {
-    //     return {
-    //       // isGlobal: true,
-    //       store: redisStore,
-    //       host: configService.get<string>('REDIS_HOST'),
-    //       port: configService.get<number>('REDIS_PORT'),
-    //       username: configService.get<string>('REDIS_USERNAME'),
-    //       password: configService.get<string>('REDIS_PASSWORD'),
-    //     }
-    //   },
-    // })
+    // CacheModule.register({
+    //   isGlobal: true,
+    //   store: redisStore,
+    //   // Store-specific configuration:
+    //   host: 'localhost',
+    //   port: 6379,
+    // }),
+    CacheModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return {
+          // isGlobal: true,
+          store: redisStore,
+          host: configService.get<string>('REDIS_HOST'),
+          port: configService.get<number>('REDIS_PORT'),
+          // username: configService.get<string>('REDIS_USERNAME'),
+          // password: configService.get<string>('REDIS_PASSWORD'),
+        }
+      },
+    })
   ],
   controllers: [PostController, CategoryController],
   providers: [

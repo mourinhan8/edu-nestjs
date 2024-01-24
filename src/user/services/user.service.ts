@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { CreateUserDto, LoginUserDto } from '../dto/user.dto';
 import * as bcrypt from 'bcrypt';
+import { MailerService } from '@nestjs-modules/mailer';
 // import { InjectQueue } from '@nestjs/bull';
 // import { Queue } from 'bull';
 
@@ -9,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
+    private mailerService: MailerService
     // @InjectQueue('send-mail')
     // private sendMail: Queue,
   ) {}
@@ -33,14 +35,14 @@ export class UserService {
     //     removeOnComplete: true,
     //   },
     // );
-    // await this.mailerService.sendMail({
-    //   to: userDto.email,
-    //   subject: 'Welcome to my website',
-    //   template: './welcome',
-    //   context: {
-    //     name: userDto.name,
-    //   },
-    // });
+    await this.mailerService.sendMail({
+      to: userDto.email,
+      subject: 'Welcome to my website',
+      template: './welcome',
+      context: {
+        name: userDto.name,
+      },
+    });
 
     return await this.userRepository.create(userDto);
   }

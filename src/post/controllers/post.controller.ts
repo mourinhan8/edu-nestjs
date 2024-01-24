@@ -55,19 +55,19 @@ export class PostController {
   // @UseFilters(HttpExceptionFilter)
   // @UseFilters(ExceptionLoggerFilter)
   getPostDetailWithCache(@Param('id') id: string) {
-    console.log('Run here')
     return this.postService.getPostById(id);
   }
 
   @Post('cache/demo/set-cache')
   async demoSetCache() {
-    await this.cacheManager.set('newnet', 'hello world', 60 * 10);
-    return true;
+    const result = await this.cacheManager.set('newnet', 'hello world', { ttl: 60 * 10 });
+    return result;
   }
 
   @Get('cache/demo/get-cache')
   async demoGetCache() {
-    return await this.cacheManager.get('newnet');
+    const result = await this.cacheManager.get('newnet');
+    return result;
   }
 
 
