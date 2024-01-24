@@ -13,6 +13,8 @@ import { JwtStrategy } from './jwt.stragery';
 import { AuthService } from './services/auth.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserController } from './controllers/user.controller';
+import { BullModule } from '@nestjs/bull';
+import { EmailConsumer } from './consumer/email.consumer';
 
 // @Global()
 @Module({
@@ -38,9 +40,16 @@ import { UserController } from './controllers/user.controller';
       }),
       inject: [ConfigService],
     }),
+    BullModule.registerQueue({ name: 'send-mail' }),
   ],
   controllers: [AuthController, UserController],
-  providers: [UserService, AuthService, UserRepository, JwtStrategy],
+  providers: [
+    UserService,
+    AuthService,
+    UserRepository,
+    JwtStrategy,
+    EmailConsumer,
+  ],
   exports: [UserService],
 })
 export class UserModule {}

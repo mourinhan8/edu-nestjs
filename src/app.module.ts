@@ -12,6 +12,7 @@ import { SubscriberModule } from './subscriber/subscriber.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { join } from 'path';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -39,6 +40,24 @@ import { join } from 'path';
           options: {
             strict: true,
           },
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    // BullModule.forRoot({
+    //   redis: {
+    //     host: process.env.REDIS_HOST,
+    //     port: Number(process.env.REDIS_PORT),
+    //   },
+    // }),
+    BullModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => ({
+        redis: {
+          host: config.get('REDIS_HOST'),
+          port: config.get('REDIS_PORT'),
+          // username: config.get('REDIS_USERNAME'),
+          // password: config.get('REDIS_PASSWORD'),
         },
       }),
       inject: [ConfigService],
